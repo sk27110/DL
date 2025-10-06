@@ -1,0 +1,156 @@
+# ================================
+# Python
+# ================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ================================
+# Virtual Environments
+# ================================
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ================================
+# IDE
+# ================================
+# PyCharm
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# ================================
+# Data and Models
+# ================================
+data/
+*.csv
+*.json
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.model
+*.pth
+*.pt
+*.onnx
+*.mlmodel
+
+# Dataset directories
+data/aircraft_data/
+raw_data/
+processed_data/
+external_data/
+
+# ================================
+# Logs and Results
+# ================================
+logs/
+*.log
+tensorboard/
+runs/
+wandb/
+mlruns/
+checkpoints/
+outputs/
+results/
+experiments/
+
+# ================================
+# OS and Editor
+# ================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# ================================
+# Project Specific
+# ================================
+# Hugging Face cache
+.cache/
+.huggingface/
+
+# Weights and Biases
+wandb/
+
+# DVC (if using)
+.dvc/
+
+# ================================
+# Configuration files with secrets
+# ================================
+config_local.py
+secrets.py
+.env.local
+*.key
+*.pem
+
+# ================================
+# Package management
+# ================================
+Pipfile
+Pipfile.lock
+poetry.lock
+pyproject.toml  # Но обычно это нужно коммитить, так что раскомментируйте если не используете poetry
+
+# ================================
+# Testing
+# ================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
