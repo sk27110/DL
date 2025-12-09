@@ -64,7 +64,7 @@ class Decoder(nn.Module):
     def forward(self, features, captions, tgt_mask, tgt_key_padding_mask):
 
 
-        captions = captions.transpose(0, 1) # De (B, S) para (S, B)
+        captions = captions.transpose(0, 1)
         embeddings = self.dropout(self.embed(captions) * math.sqrt(self.embed_size))
         embeddings = self.pos_encoder(embeddings)
 
@@ -85,7 +85,7 @@ class Decoder(nn.Module):
     
 
 class EncoderDecoder(nn.Module):
-    def __init__(self, embed_size, num_heads, vocab_size, num_layers, dropout=0.1):
+    def __init__(self, embed_size, num_heads, vocab_size, num_layers, dropout=0.4):
         super().__init__()
         self.encoder = Encoder(embed_size) 
         self.decoder = Decoder(embed_size, num_heads, num_layers, vocab_size, dropout)

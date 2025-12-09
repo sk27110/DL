@@ -4,9 +4,10 @@ import numpy as np
 from tqdm import tqdm
 import os
 
+
 class Trainer:
     def __init__(self, model, train_loader, val_loader, optimizer, scheduler, criterion, save_path,
-                 patience=5, pad_idx=0, max_gen_len=20, tokenizer=None):
+                 patience=5, pad_idx=0, end_idx = 2, max_gen_len=20, tokenizer=None):
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -16,6 +17,7 @@ class Trainer:
         self.save_path = save_path
         self.patience = patience
         self.pad_idx = pad_idx
+        self.end_idx = end_idx
         self.max_gen_len = max_gen_len
         self.tokenizer = tokenizer
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -80,15 +82,23 @@ class Trainer:
                 val_loss += loss.item()
 
 
-                if batch_idx < 3 and self.tokenizer is not None:
-                    pred_ids = outputs.argmax(dim=-1)
-                    for i in range(min(2, pred_ids.size(0))):
-                        pred_tokens = [self.tokenizer.itos[idx] for idx in pred_ids[i].cpu().numpy() if idx != self.pad_idx]
-                        true_tokens = [self.tokenizer.itos[idx] for idx in captions[i].cpu().numpy() if idx != self.pad_idx]
+                if batch_idx < 3:
+                    for i in range(min(2, features.size(0))):
+                        gen_ids = self.generate(features[i].unsqueeze(0), sos_idx=self.tokenizer.stoi["<START>"])
+                        gen_tokens = [self.tokenizer.itos[idx] for idx in gen_ids if idx != self.tokenizer.stoi["<PAD>"]]
+                        true_tokens = [self.tokenizer.itos[idx] for idx in captions[i].cpu().numpy() if idx != self.tokenizer.stoi["<PAD>"]]
+
                         examples.append({
-                            "prediction": " ".join(pred_tokens),
+                            "prediction": " ".join(gen_tokens),
                             "ground_truth": " ".join(true_tokens)
                         })
+
+            log_dict = {}
+            for idx, ex in enumerate(examples):
+                log_dict[f"example_{idx}_prediction"] = ex["prediction"]
+                log_dict[f"example_{idx}_ground_truth"] = ex["ground_truth"]
+
+            wandb.log(log_dict)
 
         avg_val_loss = val_loss / len(self.val_loader)
         return avg_val_loss, examples
@@ -104,7 +114,7 @@ class Trainer:
             output = self.model(features, tgt_input, tgt_mask, None)
             next_token = output[:, -1, :].argmax(dim=-1).item()
             generated.append(next_token)
-            if next_token == self.pad_idx:
+            if next_token == self.end_idx:
                 break
         return generated
 

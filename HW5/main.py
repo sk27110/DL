@@ -5,6 +5,7 @@ from src.utils import CollateFn
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from transformers import get_cosine_schedule_with_warmup
 
 
 def main():
@@ -35,18 +36,18 @@ def main():
     vocab_size = len(train.vocab)
     num_epochs = 10
     num_heads = 8
-    learning_rate = 0.0005
+    learning_rate = 1e-4
 
     model = EncoderDecoder(embed_size, hidden_size, vocab_size, num_layers)
 
-    criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"])
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"], label_smoothing=0.1)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.05)
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    total_steps = len(train_loader) * num_epochs
+    scheduler = get_cosine_schedule_with_warmup(
         optimizer,
-        mode='min',         
-        factor=0.5,         
-        patience=3,         
+        num_warmup_steps=500,      
+        num_training_steps=total_steps
     )
 
     trainer = Trainer(
@@ -56,7 +57,7 @@ def main():
         optimizer=optimizer,
         scheduler=scheduler,
         criterion=criterion,
-        save_path="./",
+        save_path="./best_model.pth",
         pad_idx=pad_idx,
         patience=5,
         max_gen_len=20,
