@@ -8,7 +8,7 @@ class Encoder(nn.Module):
     def __init__(self, embed_size, train_CNN=False):
         super(Encoder, self).__init__()
         self.train_CNN = train_CNN
-        self.inception = models.resnet101(weights=models.ResNet101_Weights.DEFAULT)
+        self.inception = models.resnet50(weights="DEFAULT", progress=True)
         self.inception.fc = nn.Linear(self.inception.fc.in_features, embed_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.5)

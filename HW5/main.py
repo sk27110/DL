@@ -34,7 +34,7 @@ def main():
     hidden_size = 512
     num_layers = 3
     vocab_size = len(train.vocab)
-    num_epochs = 10
+    num_epochs = 100
     num_heads = 8
     learning_rate = 1e-4
 
@@ -66,3 +66,6 @@ def main():
     
     trainer.train()
 
+
+if __name__ == "__main__":
+    main()
