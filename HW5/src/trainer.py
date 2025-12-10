@@ -134,6 +134,9 @@ class Trainer:
                 best_val = val_loss
                 wait = 0
                 torch.save(self.model.state_dict(), self.save_path)
+                artifact = wandb.Artifact('my_model', type='model')  # Имя артефакта и тип
+                artifact.add_file(self.save_path)  # Добавь локальный файл модели (например, 'best_model.pth')
+                wandb.log_artifact(artifact)
                 best_checkpoint = self.save_path
             else:
                 wait += 1
