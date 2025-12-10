@@ -11,10 +11,10 @@ from transformers import get_cosine_schedule_with_warmup
 def main():
     train, val, test = get_datasets()
     pad_idx = train.vocab.stoi["<PAD>"]
-
+    batch_size = 64
     train_loader = DataLoader(
         train, 
-        batch_size=16, 
+        batch_size=batch_size, 
         num_workers=2, 
         shuffle=True, 
         pin_memory=True,
@@ -23,7 +23,7 @@ def main():
 
     val_loader = DataLoader(
         val, 
-        batch_size=64, 
+        batch_size=batch_size, 
         num_workers=2, 
         shuffle=False,
         pin_memory=True, 
@@ -40,14 +40,23 @@ def main():
 
     model = EncoderDecoder(embed_size, hidden_size, vocab_size, num_layers)
 
-    criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"], label_smoothing=0.1)
+    criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"], label_smoothing=0.03)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.05)
 
+    train_dataset_len = len(train_loader.dataset) 
+
+    total_steps = (train_dataset_len // batch_size) * num_epochs
     total_steps = len(train_loader) * num_epochs
+
+    warmup_steps = 500         
+
+
     scheduler = get_cosine_schedule_with_warmup(
         optimizer,
-        num_warmup_steps=500,      
-        num_training_steps=total_steps
+        num_warmup_steps=warmup_steps,         
+        num_training_steps=total_steps,          
+        num_cycles=0.5,                         
+        last_epoch=-1
     )
 
     trainer = Trainer(
