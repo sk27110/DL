@@ -7,26 +7,29 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from transformers import get_cosine_schedule_with_warmup
 
+import wandb
 
 def main():
     train, val, test = get_datasets()
+    wandb.login(key='0d383f9804c0d163ecad195c54e115e46c91e8a3')
     pad_idx = train.vocab.stoi["<PAD>"]
     batch_size = 64
+    batch_size = 64
     train_loader = DataLoader(
-        train, 
-        batch_size=batch_size, 
-        num_workers=2, 
-        shuffle=True, 
+        train,
+        batch_size=batch_size,
+        num_workers=2,
+        shuffle=True,
         pin_memory=True,
         collate_fn=CollateFn(pad_idx)
     )
 
     val_loader = DataLoader(
-        val, 
-        batch_size=batch_size, 
-        num_workers=2, 
+        val,
+        batch_size=batch_size,
+        num_workers=2,
         shuffle=False,
-        pin_memory=True, 
+        pin_memory=True,
         collate_fn=CollateFn(pad_idx)
     )
 
@@ -34,30 +37,40 @@ def main():
     hidden_size = 512
     num_layers = 3
     vocab_size = len(train.vocab)
-    num_epochs = 100
+    num_epochs = 20
     num_heads = 8
-    learning_rate = 1e-4
+    learning_rate = 2e-5
+    train_CNN = True
 
-    model = EncoderDecoder(embed_size, hidden_size, vocab_size, num_layers)
+    model = EncoderDecoder(
+        embed_size=embed_size,
+        num_heads=num_heads,
+        vocab_size=vocab_size,
+        num_layers=num_layers,
+        dropout=0.4,
+        num_encoder_layers=3,
+        train_CNN=train_CNN
+    )
 
     criterion = nn.CrossEntropyLoss(ignore_index=train.vocab.stoi["<PAD>"], label_smoothing=0.03)
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.05)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.03)
 
-    train_dataset_len = len(train_loader.dataset) 
+    train_dataset_len = len(train_loader.dataset)
 
     total_steps = (train_dataset_len // batch_size) * num_epochs
     total_steps = len(train_loader) * num_epochs
 
-    warmup_steps = 500         
+    warmup_steps = 500
 
 
     scheduler = get_cosine_schedule_with_warmup(
         optimizer,
-        num_warmup_steps=warmup_steps,         
-        num_training_steps=total_steps,          
-        num_cycles=0.5,                         
+        num_warmup_steps=warmup_steps,
+        num_training_steps=total_steps,
+        num_cycles=0.5,
         last_epoch=-1
     )
+
 
     trainer = Trainer(
         model=model,
@@ -66,10 +79,10 @@ def main():
         optimizer=optimizer,
         scheduler=scheduler,
         criterion=criterion,
-        save_path="./best_model.pth",
+        save_path="./save_dir",
         pad_idx=pad_idx,
         patience=5,
-        max_gen_len=20,
+        max_gen_len=25,
         tokenizer=train.vocab
             )
     

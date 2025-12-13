@@ -1,16 +1,11 @@
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import Dataset
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import os
 from PIL import Image
-from textwrap import wrap
-from pathlib import Path
 from sklearn.model_selection import train_test_split
 import kagglehub
 from io import StringIO
-from transformers import AutoTokenizer
-import spacy 
+import spacy
 import torch
 import torchvision.transforms as T
 
@@ -19,7 +14,7 @@ import torchvision.transforms as T
 val_transform = T.Compose([
     T.Resize((224, 224)),
     T.ToTensor(),
-    T.Normalize((0.485, 0.456, 0.406), 
+    T.Normalize((0.485, 0.456, 0.406),
                          (0.229, 0.224, 0.225))
 ])
 
@@ -47,7 +42,7 @@ class Vocabulary:
 
     def tokenizer_eng(self, text):
         return [tok.text.lower() for tok in self.spacy_eng.tokenizer(text)]
-        
+
     def build_vocabulary(self, sentence_list):
         frequencies = {}
         idx = 4
@@ -122,5 +117,5 @@ def get_datasets():
     train_dataset = FlickrDataset(df_train, path, 4, train_transform)
     val_dataset = FlickrDataset(df_val, path, 4, val_transform, train_dataset.vocab)
     test_dataset = FlickrDataset(df_test, path, 4, val_transform, train_dataset.vocab)
-    
+
     return train_dataset, val_dataset, test_dataset

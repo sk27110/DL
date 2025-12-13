@@ -7,7 +7,7 @@ import os
 
 class Trainer:
     def __init__(self, model, train_loader, val_loader, optimizer, scheduler, criterion, save_path,
-                 patience=5, pad_idx=0, end_idx = 2, max_gen_len=20, tokenizer=None):
+                 patience=5, pad_idx=0, end_idx=2, max_gen_len=20, tokenizer=None, num_epochs=100):
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -20,6 +20,7 @@ class Trainer:
         self.end_idx = end_idx
         self.max_gen_len = max_gen_len
         self.tokenizer = tokenizer
+        self.num_epochs = num_epochs
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.model.to(self.device)
@@ -27,20 +28,40 @@ class Trainer:
         if save_dir != "":
             os.makedirs(save_dir, exist_ok=True)
 
+        wandb.init(project="transformer_image_captioning")
+
+        vocab_state = {
+            "itos": self.tokenizer.itos,
+            "stoi": self.tokenizer.stoi,
+            "freq_threshold": self.tokenizer.freq_threshold,
+            "special_tokens": {
+                "pad": self.tokenizer.stoi["<PAD>"],
+                "start": self.tokenizer.stoi["<START>"],
+                "end": self.tokenizer.stoi["<END>"],
+                "unk": self.tokenizer.stoi["<UNK>"],
+            }
+        }
+        torch.save(vocab_state, self.save_path + "/tokenizer.pth")
+        artifact = wandb.Artifact('tokenizer', type='tokenizer')
+        artifact.add_file(self.save_path)
+        wandb.log_artifact(artifact)
+
+
     def _get_tgt_mask(self, seq_len):
-        mask = torch.triu(torch.ones(seq_len, seq_len) * float('-inf'), diagonal=1).to(self.device)
-        return mask
+        return torch.triu(torch.ones(seq_len, seq_len, dtype=torch.bool, device=self.device), diagonal=1)
 
     def _get_padding_mask(self, captions):
         return (captions == self.pad_idx).to(self.device)
+
 
     def _train_one_epoch(self):
         self.model.train()
         train_loss = 0
 
         for batch in tqdm(self.train_loader, desc="Training"):
-            features, captions = batch
-            features, captions = features.to(self.device), captions.to(self.device)
+            images, captions = batch
+            images = images.to(self.device)
+            captions = captions.to(self.device)
 
             tgt_input = captions[:, :-1]
             targets = captions[:, 1:]
@@ -48,19 +69,30 @@ class Trainer:
             tgt_mask = self._get_tgt_mask(tgt_input.shape[1])
             tgt_key_padding_mask = self._get_padding_mask(tgt_input)
 
-            outputs = self.model(features, tgt_input, tgt_mask, tgt_key_padding_mask)
-
-            loss = self.criterion(outputs.reshape(-1, outputs.shape[2]), targets.reshape(-1))
 
             self.optimizer.zero_grad()
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
-            self.optimizer.step()
 
-            train_loss += loss.item()
+            outputs = self.model(images, tgt_input, tgt_mask, tgt_key_padding_mask)
+            loss = self.criterion(outputs.reshape(-1, outputs.shape[-1]), targets.reshape(-1))
+
+            loss.backward()
+
+            grad_norm = torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+
+            self.optimizer.step()
+            self.scheduler.step()
+            current_lr = self.optimizer.param_groups[0]["lr"]
+
+            wandb.log({
+                "batch_train_loss": loss.detach().item(),
+                "grad_norm": grad_norm.item(),
+                "learning_rate": current_lr
+            })
+            train_loss += loss.detach().item()
 
         avg_train_loss = train_loss / len(self.train_loader)
         return avg_train_loss
+
 
     def _validate(self):
         self.model.eval()
@@ -68,8 +100,10 @@ class Trainer:
         examples = []
 
         with torch.no_grad():
-            for batch_idx, (features, captions) in enumerate(tqdm(self.val_loader, desc="Validation")):
-                features, captions = features.to(self.device), captions.to(self.device)
+            for batch_idx, batch in enumerate(tqdm(self.val_loader, desc="Validation")):
+                images, captions = batch
+                images = images.to(self.device)
+                captions = captions.to(self.device)
 
                 tgt_input = captions[:, :-1]
                 targets = captions[:, 1:]
@@ -77,21 +111,23 @@ class Trainer:
                 tgt_mask = self._get_tgt_mask(tgt_input.shape[1])
                 tgt_key_padding_mask = self._get_padding_mask(tgt_input)
 
-                outputs = self.model(features, tgt_input, tgt_mask, tgt_key_padding_mask)
-                loss = self.criterion(outputs.reshape(-1, outputs.shape[2]), targets.reshape(-1))
-                val_loss += loss.item()
+                outputs = self.model(images, tgt_input, tgt_mask, tgt_key_padding_mask)
+                loss = self.criterion(outputs.reshape(-1, outputs.shape[-1]), targets.reshape(-1))
+                val_loss += loss.detach().item()
 
-
-                if batch_idx < 3:
-                    for i in range(min(2, features.size(0))):
-                        gen_ids = self.generate(features[i].unsqueeze(0), sos_idx=self.tokenizer.stoi["<START>"])
-                        gen_tokens = [self.tokenizer.itos[idx] for idx in gen_ids if idx != self.tokenizer.stoi["<PAD>"]]
-                        true_tokens = [self.tokenizer.itos[idx] for idx in captions[i].cpu().numpy() if idx != self.tokenizer.stoi["<PAD>"]]
-
-                        examples.append({
-                            "prediction": " ".join(gen_tokens),
-                            "ground_truth": " ".join(true_tokens)
-                        })
+                if batch_idx < 1:
+                    for i in range(min(20, images.size(0))):
+                        if i%5==0:
+                            gen_ids = self.model.generate(images[i].unsqueeze(0), max_len=self.max_gen_len,
+                                                           start_token=self.tokenizer.stoi["<START>"],
+                                                           end_token=self.end_idx, beam_width=1)[0]
+                            gen_tokens = [self.tokenizer.itos[idx] for idx in gen_ids if idx != self.tokenizer.stoi["<PAD>"]]
+                            true_tokens = [self.tokenizer.itos[idx] for idx in captions[i].cpu().numpy() if idx != self.tokenizer.stoi["<PAD>"]]
+    
+                            examples.append({
+                                "prediction": " ".join(gen_tokens),
+                                "ground_truth": " ".join(true_tokens)
+                            })
 
             log_dict = {}
             for idx, ex in enumerate(examples):
@@ -103,39 +139,32 @@ class Trainer:
         avg_val_loss = val_loss / len(self.val_loader)
         return avg_val_loss, examples
 
-    @torch.no_grad()
-    def generate(self, features, sos_idx):
-        self.model.eval()
-        features = features.to(self.device)
-        generated = [sos_idx]
-        for _ in range(self.max_gen_len):
-            tgt_input = torch.tensor(generated, device=self.device).unsqueeze(0) 
-            tgt_mask = self._get_tgt_mask(tgt_input.shape[1])
-            output = self.model(features, tgt_input, tgt_mask, None)
-            next_token = output[:, -1, :].argmax(dim=-1).item()
-            generated.append(next_token)
-            if next_token == self.end_idx:
-                break
-        return generated
-
-    def train(self, num_epochs=10):
+    def train(self):
         best_val = np.inf
         wait = 0
 
-        wandb.init(project="transformer_image_captioning")
-
-        for epoch in range(1, num_epochs + 1):
+        for epoch in range(1, self.num_epochs + 1):
             train_loss = self._train_one_epoch()
             val_loss, examples = self._validate()
-
-            self.scheduler.step(val_loss)
 
             if val_loss < best_val:
                 best_val = val_loss
                 wait = 0
-                torch.save(self.model.state_dict(), self.save_path)
-                artifact = wandb.Artifact('my_model', type='model')  # Имя артефакта и тип
-                artifact.add_file(self.save_path)  # Добавь локальный файл модели (например, 'best_model.pth')
+                torch.save({
+                "model_state_dict": self.model.state_dict(),
+                "model_class": "EncoderDecoder",
+                "model_args": {
+                    "embed_size": self.model.embed_size,
+                    "num_heads": self.model.num_heads,
+                    "num_layers": self.model.num_layers,
+                    "num_encoder_layers": self.model.num_encoder_layers,
+                    "vocab_size": self.model.vocab_size,
+                    "dropout": self.model.dropout,
+                    "train_CNN": self.model.train_CNN
+                }
+            }, self.save_path + "/best_model.pth")
+                artifact = wandb.Artifact('my_model', type='model')
+                artifact.add_file(self.save_path)
                 wandb.log_artifact(artifact)
                 best_checkpoint = self.save_path
             else:
@@ -153,7 +182,7 @@ class Trainer:
                 log_dict[f"example_{idx}_prediction"] = ex["prediction"]
                 log_dict[f"example_{idx}_ground_truth"] = ex["ground_truth"]
 
-            wandb.log(log_dict, step=epoch)
+            wandb.log(log_dict)
 
             print(f"Epoch {epoch}: train_loss={train_loss:.4f}, val_loss={val_loss:.4f}")
             for ex in examples:
