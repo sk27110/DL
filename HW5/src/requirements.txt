@@ -5,3 +5,5 @@ wandb
 transformers
 pillow
 numpy
+kagglehub
+en_core_web_sm-3.x.x-py3-none-any.whl
