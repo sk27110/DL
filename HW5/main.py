@@ -10,8 +10,8 @@ from transformers import get_cosine_schedule_with_warmup
 import wandb
 
 def main():
-    train, val, test = get_datasets()
-    wandb.login(key='0d383f9804c0d163ecad195c54e115e46c91e8a3')
+    train, val, _ = get_datasets()
+    wandb.login(key='ключ от wandb')
     pad_idx = train.vocab.stoi["<PAD>"]
     batch_size = 64
     batch_size = 64
@@ -34,7 +34,6 @@ def main():
     )
 
     embed_size = 512
-    hidden_size = 512
     num_layers = 3
     vocab_size = len(train.vocab)
     num_epochs = 20

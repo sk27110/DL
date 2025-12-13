@@ -69,7 +69,7 @@ class Vocabulary:
 
 
 class FlickrDataset(Dataset):
-    def __init__(self, df, root_path ,freq_threshold=4, transform=None, vocab=None):
+    def __init__(self, df, root_path ,freq_threshold=4, transform=None, vocab=None, return_img_idx = False):
         self.df = df.reset_index(drop=True)
         if vocab is None:
             self.vocab = Vocabulary(freq_threshold=freq_threshold)
@@ -98,6 +98,29 @@ class FlickrDataset(Dataset):
 
 
 
+class FlickrTestDataset(Dataset):
+    def __init__(self, df_grouped, root_path, transform=None):
+        self.df = df_grouped.reset_index(drop=True)
+        self.transform = transform
+        self.root_path = root_path
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+
+        img_name = row['image']
+        captions = row['captions']
+
+        img_path = os.path.join(self.root_path, "Images", img_name)
+        image = Image.open(img_path).convert('RGB')
+        image = self.transform(image)
+
+
+        return image, captions, img_name
+
+
 def get_datasets():
     path = kagglehub.dataset_download("adityajn105/flickr8k")
 
@@ -112,10 +135,18 @@ def get_datasets():
 
     df_train = df[df["image"].isin(train_imgs)].reset_index(drop=True)
     df_val   = df[df["image"].isin(val_imgs)].reset_index(drop=True)
-    df_test  = df[df["image"].isin(test_imgs)].reset_index(drop=True)
 
     train_dataset = FlickrDataset(df_train, path, 4, train_transform)
     val_dataset = FlickrDataset(df_val, path, 4, val_transform, train_dataset.vocab)
-    test_dataset = FlickrDataset(df_test, path, 4, val_transform, train_dataset.vocab)
+    df_test_grouped = (
+        df[df["image"].isin(test_imgs)]
+        .groupby("image")["caption"]
+        .apply(list)
+        .reset_index(name="captions") 
+    )
+
+    assert all(len(captions) == 5 for captions in df_test_grouped["captions"])
+
+    test_dataset = FlickrTestDataset(df_test_grouped, path, val_transform)
 
     return train_dataset, val_dataset, test_dataset

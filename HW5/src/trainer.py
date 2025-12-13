@@ -21,6 +21,8 @@ class Trainer:
         self.max_gen_len = max_gen_len
         self.tokenizer = tokenizer
         self.num_epochs = num_epochs
+        self.tokenizer_path = os.path.join(self.save_path, "tokenizer.pth")
+        self.model_path = os.path.join(self.save_path, "best_model.pth")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.model.to(self.device)
@@ -39,9 +41,9 @@ class Trainer:
                 "unk": self.tokenizer.stoi["<UNK>"],
             }
         }
-        torch.save(vocab_state, self.save_path + "/tokenizer.pth")
+        torch.save(vocab_state, self.tokenizer_path)
         artifact = wandb.Artifact('tokenizer', type='tokenizer')
-        artifact.add_file(self.save_path)
+        artifact.add_file(self.tokenizer_path)
         wandb.log_artifact(artifact)
 
 
@@ -160,11 +162,11 @@ class Trainer:
                     "dropout": self.model.dropout,
                     "train_CNN": self.model.train_CNN
                 }
-            }, self.save_path + "/best_model.pth")
+            }, self.model_path)
                 artifact = wandb.Artifact('my_model', type='model')
-                artifact.add_file(self.save_path)
+                artifact.add_file(self.model_path)
                 wandb.log_artifact(artifact)
-                best_checkpoint = self.save_path
+                best_checkpoint = self.model_path
             else:
                 wait += 1
                 if wait >= self.patience:
