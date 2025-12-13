@@ -24,9 +24,7 @@ class Trainer:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.model.to(self.device)
-        save_dir = os.path.dirname(save_path)
-        if save_dir != "":
-            os.makedirs(save_dir, exist_ok=True)
+        os.makedirs(self.save_path, exist_ok=True)
 
         wandb.init(project="transformer_image_captioning")
 
