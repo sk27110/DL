@@ -2,6 +2,70 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 import math
+import torch.nn.functional as F
+
+
+def selective_scan(u, delta, A, B, C, D=None, delta_bias=None, delta_softplus=False):
+    b, l, d = u.shape
+    n = A.shape[1]
+    Delta = delta
+    if delta_bias is not None:
+        Delta = Delta + delta_bias.unsqueeze(0).unsqueeze(0)
+    if delta_softplus:
+        Delta = F.softplus(Delta)
+    A_bar = torch.exp(Delta.unsqueeze(-1) * A.unsqueeze(0).unsqueeze(0))  # (b, l, d, n)
+    B_bar = Delta.unsqueeze(-1) * B.unsqueeze(2)  # (b, l, d, n)
+    h = torch.zeros(b, d, n, device=u.device)
+    ys = torch.zeros(b, l, d, device=u.device)
+    for i in range(l):
+        h = A_bar[:, i] * h + B_bar[:, i] * u[:, i].unsqueeze(-1)
+        y = (h * C[:, i].unsqueeze(1)).sum(-1)
+        if D is not None:
+            y += D * u[:, i]
+    ys[:, i] = y
+    return ys
+
+
+class Mamba(nn.Module):
+    def __init__(self, d_model, d_state=16, d_conv=4, expand=2):
+        super().__init__()
+        self.d_model = d_model
+        self.d_state = d_state
+        self.d_conv = d_conv
+        self.expand = expand
+        self.d_inner = int(self.expand * self.d_model)
+        self.dt_rank = math.ceil(self.d_model / 16)
+        self.in_proj = nn.Linear(self.d_model, self.d_inner * 2, bias=False)
+        self.conv1d = nn.Conv1d(self.d_inner, self.d_inner, kernel_size=self.d_conv, bias=True, groups=self.d_inner, padding=self.d_conv - 1)
+        self.act = nn.SiLU()
+        self.x_proj = nn.Linear(self.d_inner, self.dt_rank + self.d_state * 2, bias=False)
+        self.dt_proj = nn.Linear(self.dt_rank, self.d_inner, bias=True)
+        # Initialize dt_proj bias
+        dt_init_std = self.dt_rank ** -0.5
+        nn.init.uniform_(self.dt_proj.weight, -dt_init_std, dt_init_std)
+        dt = torch.exp(torch.rand(self.d_inner) * (math.log(0.1) - math.log(0.001)) + math.log(0.001))
+        self.dt_proj.bias.data = torch.log(dt)
+        A = torch.arange(1, self.d_state + 1, dtype=torch.float32).repeat(self.d_inner, 1)
+        self.A_log = nn.Parameter(torch.log(A))
+        self.D = nn.Parameter(torch.ones(self.d_inner))
+        self.out_proj = nn.Linear(self.d_inner, self.d_model, bias=False)
+
+    def forward(self, x):
+        b, l, d = x.shape
+        x_and_res = self.in_proj(x)  # (b, l, 2 * d_inner)
+        x, res = x_and_res.chunk(2, dim=-1)
+        x = x.permute(0, 2, 1)  # (b, d_inner, l)
+        x = self.conv1d(x)[:, :, :l]
+        x = x.permute(0, 2, 1)  # (b, l, d_inner)
+        x = self.act(x)
+        x_db = self.x_proj(x)  # (b, l, dt_rank + 2*d_state)
+        dt, B, C = torch.split(x_db, [self.dt_rank, self.d_state, self.d_state], dim=-1)
+        dt = self.dt_proj(dt)  # (b, l, d_inner)
+        A = -torch.exp(self.A_log)  # (d_inner, d_state)
+        y = selective_scan(x, dt, A, B, C, self.D, delta_softplus=True)
+        y = y * self.act(res)
+        y = self.out_proj(y)
+        return y
 
 
 class Encoder(nn.Module):
@@ -75,6 +139,43 @@ class PositionalEncoding(nn.Module):
         return x + self.pe[:x.size(0), :]
 
 
+class MambaDecoderLayer(nn.Module):
+    def __init__(self, embed_size, num_heads, dim_feedforward, dropout):
+        super().__init__()
+        self.mamba = Mamba(embed_size)
+        self.cross_attn = nn.MultiheadAttention(embed_size, num_heads, dropout=dropout)
+        self.linear1 = nn.Linear(embed_size, dim_feedforward)
+        self.dropout = nn.Dropout(dropout)
+        self.linear2 = nn.Linear(dim_feedforward, embed_size)
+
+        self.norm1 = nn.LayerNorm(embed_size)
+        self.norm2 = nn.LayerNorm(embed_size)
+        self.norm3 = nn.LayerNorm(embed_size)
+        self.dropout1 = nn.Dropout(dropout)
+        self.dropout2 = nn.Dropout(dropout)
+        self.dropout3 = nn.Dropout(dropout)
+
+        self.activation = nn.ReLU()
+
+    def forward(self, tgt, memory, tgt_mask=None, tgt_key_padding_mask=None):
+        x = tgt
+        # Mamba as self "attention"
+        mamba_input = x.permute(1, 0, 2)  # (seq, batch, d) -> (batch, seq, d)
+        x2 = self.mamba(mamba_input)
+        x2 = x2.permute(1, 0, 2)  # back to (seq, batch, d)
+        x = x + self.dropout1(x2)
+        x = self.norm1(x)
+        # Cross attention
+        x2 = self.cross_attn(x, memory, memory, attn_mask=None, key_padding_mask=None)[0]
+        x = x + self.dropout2(x2)
+        x = self.norm2(x)
+        # FF
+        x2 = self.linear2(self.dropout(self.activation(self.linear1(x))))
+        x = x + self.dropout3(x2)
+        x = self.norm3(x)
+        return x
+
+
 class Decoder(nn.Module):
     def __init__(self, embed_size, num_heads, num_layers, vocab_size, dropout):
         super().__init__()
@@ -82,15 +183,7 @@ class Decoder(nn.Module):
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.pos_encoder = PositionalEncoding(embed_size)
 
-        decoder_layer = nn.TransformerDecoderLayer(
-            d_model=embed_size,
-            nhead=num_heads,
-            dim_feedforward=embed_size * 4,
-            dropout=dropout,
-            batch_first=False
-        )
-
-        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
+        self.layers = nn.ModuleList([MambaDecoderLayer(embed_size, num_heads, embed_size * 4, dropout) for _ in range(num_layers)])
         self.linear = nn.Linear(embed_size, vocab_size)
         self.dropout = nn.Dropout(dropout)
         self.embed_size = embed_size
@@ -106,22 +199,19 @@ class Decoder(nn.Module):
         nn.init.zeros_(self.linear.bias)
 
     def forward(self, features, captions, tgt_mask, tgt_key_padding_mask):
-        features = features.permute(1, 0, 2)
-        captions = captions.transpose(0, 1)
+        # features: (batch, mem_len, embed_size) but need to permute to (mem_len, batch, embed_size)
+        memory = features.permute(1, 0, 2)
+        captions = captions.transpose(0, 1)  # (batch, seq) -> (seq, batch)
 
         embeddings = self.embed(captions) * math.sqrt(self.embed_size)
         embeddings = self.pos_encoder(embeddings)
-        embeddings = self.dropout(embeddings)
+        output = self.dropout(embeddings)
 
-        output = self.transformer_decoder(
-            tgt=embeddings,
-            memory=features,
-            tgt_mask=tgt_mask,
-            tgt_key_padding_mask=tgt_key_padding_mask
-        )
+        for layer in self.layers:
+            output = layer(output, memory, tgt_mask=tgt_mask, tgt_key_padding_mask=tgt_key_padding_mask)
 
         output = self.linear(output)
-        output = output.transpose(0, 1) 
+        output = output.transpose(0, 1)  # (seq, batch, vocab) -> (batch, seq, vocab)
 
         return output
 
