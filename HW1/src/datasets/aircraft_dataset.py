@@ -28,12 +28,10 @@ class AircraftDataset(BaseDataset):
                         'path': str(file_path),
                         'label': 'aircraft'
                     })
-                    # print(f"Added file: {file_path}")
 
         return index
 
     def load_object(self, path):
-        # Загрузка изображения
         image = Image.open(path).convert("RGB")
         return image
 

@@ -23,18 +23,7 @@ class BaseDataset(Dataset):
         return instance_data
 
     def __len__(self):
-        """
-        Get length of the dataset (length of the index).
-        """
         return len(self._index)
 
     def load_object(self, path):
-        """
-        Load object from disk.
-
-        Args:
-            path (str): path to the object.
-        Returns:
-            data_object (Tensor):
-        """
         raise NotImplementedError("load_object() must be implemented in subclass")
