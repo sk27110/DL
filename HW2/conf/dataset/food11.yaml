@@ -1,0 +1,6 @@
+_target_: src.dataset.FoodDataset
+data_path: "./data/food11"
+# download_path: "./data"
+# name: "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign"
+# num_classes: 43
+# image_size: 32

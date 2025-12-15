@@ -1,0 +1,7 @@
+_target_: src.dataset.GtsrbDataset
+data_path: "./data/gtsrb-german-traffic-sign"
+# download_path: "./data"
+# name: "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign"
+# num_classes: 43
+# image_size: 32
+

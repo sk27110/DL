@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.env
+.venv/
+env/
+venv/
+*.egg-info/
+dist/
+build/
+project_env/
+.*.Identifier
+.Identifier
+*.Identifier
+
+# Jupyter
+.ipynb_checkpoints
+
+# PyTorch
+*.pt
+*.ckpt
+
+# Hydra / OmegaConf
+outputs/
+wandb/
+comet/
+*.hydra/
+
+# Dataset / data
+data/
+datasets/
+*.csv
+*.zip
+
+# VSCode / IDE
+.vscode/
+.idea/
+*.iml
+
+# MacOS
+.DS_Store
+
+# Other temp files
+
+*.tmp
+*.swp

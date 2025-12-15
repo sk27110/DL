@@ -1,0 +1,5 @@
+[2025-11-17 18:56:45,986][train][INFO] - 📊 TensorBoard logging to: None
+[2025-11-17 18:56:45,987][train][INFO] - 📌 Model device: cpu
+[2025-11-17 18:56:45,987][train][INFO] - 📌 Batch device: cpu
+[2025-11-17 18:56:45,987][train][INFO] - 🧪 Final testing on test set
+[2025-11-17 18:56:54,212][train][INFO] - Test Loss: 0.8031 | accuracy: 0.7540 | precision: 0.7566 | recall: 0.7540 | f1: 0.7544

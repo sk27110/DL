@@ -1,0 +1,3 @@
+data_path: "./data/gtsrb-german-traffic-sign"
+download_path: "./data"
+name: "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign"

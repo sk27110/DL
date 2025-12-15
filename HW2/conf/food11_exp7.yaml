@@ -1,0 +1,32 @@
+defaults:
+  - dataset: food11   
+  - transforms: transforms_v2
+  - dataloader: base_dataloader
+  - train: train
+  - model: resnetv2
+  - load_dataset: food
+  - metrics: base_classification_metrics
+  - optimizer: adamw
+  - scheduler: cosine_annealing
+
+
+seed: 42
+
+
+experiment:
+  name: "exp7"
+  log_dir: experiments/${experiment.name}/
+  tb_log_dir: runs/${experiment.name}
+  best_model_save_path: experiments/${experiment.name}/models/best_model.pth
+  last_model: experiments/exp5/models/best_model.pth
+
+
+hydra:
+  run:
+    dir: experiments/${experiment.name}/
+  
+  sweep:
+    dir: experiments/${experiment.name}/multirun/
+  
+  job:
+    chdir: false

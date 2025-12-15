@@ -1,0 +1,11 @@
+defaults:
+  - dataset: food11   
+  - transforms: base_transform
+  - dataloader: base_dataloader
+  - train: train
+  - model: light_model
+  - load_dataset: food
+  - metrics: base_classification_metrics
+# batch_size: 64
+# epochs: 20
+# lr: 0.001

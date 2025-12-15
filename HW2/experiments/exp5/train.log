@@ -1,0 +1,434 @@
+[2025-11-10 20:02:18,087][main][INFO] - 
+==================================================
+[2025-11-10 20:02:18,089][main][INFO] - ⚙ Текущая конфигурация Hydra:
+dataset:
+  _target_: src.dataset.FoodDataset
+  data_path: ./data/food11
+transforms:
+  _target_: src.transforms.Transforms_v2
+  mean: (0.485, 0.456, 0.406)
+  std: (0.229, 0.224, 0.225)
+  resize: (224, 224)
+dataloader:
+  _target_: src.dataloader.BaseDataLoader
+  batch_size: 64
+  shuffle: true
+  num_workers: 2
+  pin_memory: true
+train:
+  num_epoch: 140
+model:
+  _target_: src.model.ResNetV2
+  num_classes: 43
+  dropout_rate: 0.3
+load_dataset:
+  data_path: ./data/food11
+  download_path: ./data
+  name: imbikramsaha/food11
+metrics:
+  _target_: src.metrics.ClassificationMetrics
+  num_classes: 43
+optimizer:
+  _target_: src.optimizer.AdamWOptimizer
+  lr: 0.0001
+  weight_decay: 0.001
+scheduler:
+  _target_: src.scheduler.ReduceLROnPlateauScheduler
+  mode: min
+  factor: 0.5
+  patience: 6
+  threshold: 0.0001
+  min_lr: 1.0e-07
+seed: 42
+experiment:
+  name: exp5
+  log_dir: experiments/${experiment.name}/
+  tb_log_dir: runs/${experiment.name}
+  best_model_save_path: experiments/${experiment.name}/models/best_model.pth
+  last_model: None
+
+[2025-11-10 20:02:18,090][main][INFO] - ==================================================
+
+[2025-11-10 20:02:18,093][load_data][INFO] - ✅ Датасет уже существует по пути: data/food11
+[2025-11-10 20:02:45,151][train][INFO] - 📊 TensorBoard logging to: runs/exp5
+[2025-11-10 20:02:53,721][train][INFO] - ✅ Model graph logged to TensorBoard
+[2025-11-10 20:02:53,736][train][INFO] - 📌 Model device: cuda:0
+[2025-11-10 20:02:53,736][train][INFO] - 📌 Batch device: cuda
+[2025-11-10 20:02:53,736][train][INFO] - Epoch 1/140
+[2025-11-10 20:04:53,083][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.8056
+[2025-11-10 20:05:06,606][train][INFO] - Val Loss: 2.2477 | accuracy: 0.1756 | precision: 0.1062 | recall: 0.1775 | f1: 0.1114
+[2025-11-10 20:05:06,670][train][INFO] - 🏆 New best model! Val Loss: 2.2477
+[2025-11-10 20:05:10,569][train][INFO] - Epoch 2/140
+[2025-11-10 20:07:08,580][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.3515
+[2025-11-10 20:07:22,318][train][INFO] - Val Loss: 2.1585 | accuracy: 0.1956 | precision: 0.1822 | recall: 0.1970 | f1: 0.1413
+[2025-11-10 20:07:22,378][train][INFO] - 🏆 New best model! Val Loss: 2.1585
+[2025-11-10 20:07:22,378][train][INFO] - Epoch 3/140
+[2025-11-10 20:09:21,782][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.2859
+[2025-11-10 20:09:35,251][train][INFO] - Val Loss: 2.0908 | accuracy: 0.2478 | precision: 0.2252 | recall: 0.2430 | f1: 0.1990
+[2025-11-10 20:09:35,305][train][INFO] - 🏆 New best model! Val Loss: 2.0908
+[2025-11-10 20:09:35,305][train][INFO] - Epoch 4/140
+[2025-11-10 20:11:34,212][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.2366
+[2025-11-10 20:11:48,095][train][INFO] - Val Loss: 2.0870 | accuracy: 0.2333 | precision: 0.2548 | recall: 0.2280 | f1: 0.1870
+[2025-11-10 20:11:48,154][train][INFO] - 🏆 New best model! Val Loss: 2.0870
+[2025-11-10 20:11:48,155][train][INFO] - Epoch 5/140
+[2025-11-10 20:13:49,050][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.2056
+[2025-11-10 20:14:03,187][train][INFO] - Val Loss: 2.1526 | accuracy: 0.2194 | precision: 0.2339 | recall: 0.2157 | f1: 0.1811
+[2025-11-10 20:14:03,187][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 20:14:03,188][train][INFO] - Epoch 6/140
+[2025-11-10 20:16:02,168][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.1918
+[2025-11-10 20:16:15,454][train][INFO] - Val Loss: 2.0105 | accuracy: 0.3006 | precision: 0.2628 | recall: 0.2965 | f1: 0.2640
+[2025-11-10 20:16:15,518][train][INFO] - 🏆 New best model! Val Loss: 2.0105
+[2025-11-10 20:16:16,220][train][INFO] - Epoch 7/140
+[2025-11-10 20:18:12,703][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.1662
+[2025-11-10 20:18:26,263][train][INFO] - Val Loss: 2.0064 | accuracy: 0.2683 | precision: 0.2507 | recall: 0.2642 | f1: 0.2309
+[2025-11-10 20:18:26,314][train][INFO] - 🏆 New best model! Val Loss: 2.0064
+[2025-11-10 20:18:26,314][train][INFO] - Epoch 8/140
+[2025-11-10 20:20:23,367][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.1601
+[2025-11-10 20:20:36,868][train][INFO] - Val Loss: 2.0053 | accuracy: 0.3106 | precision: 0.3116 | recall: 0.3064 | f1: 0.2802
+[2025-11-10 20:20:36,922][train][INFO] - 🏆 New best model! Val Loss: 2.0053
+[2025-11-10 20:20:36,925][train][INFO] - Epoch 9/140
+[2025-11-10 20:22:34,129][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.1449
+[2025-11-10 20:22:46,901][train][INFO] - Val Loss: 2.0067 | accuracy: 0.2889 | precision: 0.2998 | recall: 0.2847 | f1: 0.2620
+[2025-11-10 20:22:46,902][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 20:22:46,902][train][INFO] - Epoch 10/140
+[2025-11-10 20:24:41,427][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.1232
+[2025-11-10 20:24:54,470][train][INFO] - Val Loss: 1.9330 | accuracy: 0.3161 | precision: 0.3614 | recall: 0.3106 | f1: 0.2773
+[2025-11-10 20:24:54,537][train][INFO] - 🏆 New best model! Val Loss: 1.9330
+[2025-11-10 20:24:54,540][train][INFO] - Epoch 11/140
+[2025-11-10 20:26:47,949][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.1128
+[2025-11-10 20:27:01,089][train][INFO] - Val Loss: 1.8925 | accuracy: 0.3311 | precision: 0.3256 | recall: 0.3241 | f1: 0.2935
+[2025-11-10 20:27:01,137][train][INFO] - 🏆 New best model! Val Loss: 1.8925
+[2025-11-10 20:27:05,292][train][INFO] - Epoch 12/140
+[2025-11-10 20:29:02,115][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0997
+[2025-11-10 20:29:15,529][train][INFO] - Val Loss: 1.9261 | accuracy: 0.3283 | precision: 0.3108 | recall: 0.3234 | f1: 0.2918
+[2025-11-10 20:29:15,530][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 20:29:15,530][train][INFO] - Epoch 13/140
+[2025-11-10 20:31:10,841][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0961
+[2025-11-10 20:31:24,188][train][INFO] - Val Loss: 1.8817 | accuracy: 0.3456 | precision: 0.3395 | recall: 0.3402 | f1: 0.3125
+[2025-11-10 20:31:24,242][train][INFO] - 🏆 New best model! Val Loss: 1.8817
+[2025-11-10 20:31:24,243][train][INFO] - Epoch 14/140
+[2025-11-10 20:33:23,481][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0891
+[2025-11-10 20:33:37,126][train][INFO] - Val Loss: 1.8740 | accuracy: 0.3394 | precision: 0.3290 | recall: 0.3337 | f1: 0.3173
+[2025-11-10 20:33:37,178][train][INFO] - 🏆 New best model! Val Loss: 1.8740
+[2025-11-10 20:33:37,178][train][INFO] - Epoch 15/140
+[2025-11-10 20:35:34,193][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0618
+[2025-11-10 20:35:47,824][train][INFO] - Val Loss: 1.8436 | accuracy: 0.3611 | precision: 0.3467 | recall: 0.3559 | f1: 0.3258
+[2025-11-10 20:35:47,876][train][INFO] - 🏆 New best model! Val Loss: 1.8436
+[2025-11-10 20:35:47,877][train][INFO] - Epoch 16/140
+[2025-11-10 20:37:42,701][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0613
+[2025-11-10 20:37:56,340][train][INFO] - Val Loss: 1.8894 | accuracy: 0.3467 | precision: 0.3408 | recall: 0.3408 | f1: 0.3148
+[2025-11-10 20:37:56,341][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 20:37:56,341][train][INFO] - Epoch 17/140
+[2025-11-10 20:39:52,247][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0456
+[2025-11-10 20:40:05,033][train][INFO] - Val Loss: 1.8439 | accuracy: 0.3489 | precision: 0.3272 | recall: 0.3440 | f1: 0.3147
+[2025-11-10 20:40:05,034][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 20:40:05,035][train][INFO] - Epoch 18/140
+[2025-11-10 20:42:01,441][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0428
+[2025-11-10 20:42:14,762][train][INFO] - Val Loss: 1.8584 | accuracy: 0.3489 | precision: 0.3316 | recall: 0.3448 | f1: 0.3168
+[2025-11-10 20:42:14,763][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 20:42:14,763][train][INFO] - Epoch 19/140
+[2025-11-10 20:44:10,116][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0357
+[2025-11-10 20:44:23,446][train][INFO] - Val Loss: 1.7958 | accuracy: 0.3733 | precision: 0.3492 | recall: 0.3673 | f1: 0.3445
+[2025-11-10 20:44:23,497][train][INFO] - 🏆 New best model! Val Loss: 1.7958
+[2025-11-10 20:44:23,497][train][INFO] - Epoch 20/140
+[2025-11-10 20:46:17,629][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0217
+[2025-11-10 20:46:30,925][train][INFO] - Val Loss: 1.7732 | accuracy: 0.3700 | precision: 0.3386 | recall: 0.3638 | f1: 0.3361
+[2025-11-10 20:46:30,987][train][INFO] - 🏆 New best model! Val Loss: 1.7732
+[2025-11-10 20:46:30,987][train][INFO] - Epoch 21/140
+[2025-11-10 20:48:27,266][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9995
+[2025-11-10 20:48:40,349][train][INFO] - Val Loss: 1.8455 | accuracy: 0.3483 | precision: 0.3324 | recall: 0.3432 | f1: 0.3122
+[2025-11-10 20:48:40,349][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 20:48:44,942][train][INFO] - Epoch 22/140
+[2025-11-10 20:50:39,297][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0028
+[2025-11-10 20:50:52,453][train][INFO] - Val Loss: 1.7672 | accuracy: 0.3856 | precision: 0.3617 | recall: 0.3811 | f1: 0.3580
+[2025-11-10 20:50:52,508][train][INFO] - 🏆 New best model! Val Loss: 1.7672
+[2025-11-10 20:50:52,508][train][INFO] - Epoch 23/140
+[2025-11-10 20:52:47,129][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9989
+[2025-11-10 20:53:00,696][train][INFO] - Val Loss: 1.7492 | accuracy: 0.3894 | precision: 0.3663 | recall: 0.3838 | f1: 0.3608
+[2025-11-10 20:53:00,763][train][INFO] - 🏆 New best model! Val Loss: 1.7492
+[2025-11-10 20:53:00,764][train][INFO] - Epoch 24/140
+[2025-11-10 20:54:54,776][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 2.0012
+[2025-11-10 20:55:07,989][train][INFO] - Val Loss: 1.8373 | accuracy: 0.3650 | precision: 0.3531 | recall: 0.3609 | f1: 0.3374
+[2025-11-10 20:55:07,990][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 20:55:07,991][train][INFO] - Epoch 25/140
+[2025-11-10 20:57:02,295][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9861
+[2025-11-10 20:57:15,387][train][INFO] - Val Loss: 1.7762 | accuracy: 0.3783 | precision: 0.3736 | recall: 0.3742 | f1: 0.3563
+[2025-11-10 20:57:15,388][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 20:57:15,388][train][INFO] - Epoch 26/140
+[2025-11-10 20:59:07,792][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9763
+[2025-11-10 20:59:20,814][train][INFO] - Val Loss: 1.7478 | accuracy: 0.4011 | precision: 0.3936 | recall: 0.3966 | f1: 0.3794
+[2025-11-10 20:59:20,882][train][INFO] - 🏆 New best model! Val Loss: 1.7478
+[2025-11-10 20:59:21,881][train][INFO] - Epoch 27/140
+[2025-11-10 21:01:16,854][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9613
+[2025-11-10 21:01:30,033][train][INFO] - Val Loss: 1.7416 | accuracy: 0.3928 | precision: 0.3824 | recall: 0.3874 | f1: 0.3669
+[2025-11-10 21:01:30,086][train][INFO] - 🏆 New best model! Val Loss: 1.7416
+[2025-11-10 21:01:30,086][train][INFO] - Epoch 28/140
+[2025-11-10 21:03:23,985][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9516
+[2025-11-10 21:03:37,322][train][INFO] - Val Loss: 1.8084 | accuracy: 0.3811 | precision: 0.3905 | recall: 0.3761 | f1: 0.3552
+[2025-11-10 21:03:37,322][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:03:37,323][train][INFO] - Epoch 29/140
+[2025-11-10 21:05:30,649][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9506
+[2025-11-10 21:05:43,966][train][INFO] - Val Loss: 1.6739 | accuracy: 0.4294 | precision: 0.4093 | recall: 0.4244 | f1: 0.4117
+[2025-11-10 21:05:44,023][train][INFO] - 🏆 New best model! Val Loss: 1.6739
+[2025-11-10 21:05:44,023][train][INFO] - Epoch 30/140
+[2025-11-10 21:07:37,359][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9449
+[2025-11-10 21:07:50,248][train][INFO] - Val Loss: 1.6968 | accuracy: 0.4217 | precision: 0.4252 | recall: 0.4184 | f1: 0.4060
+[2025-11-10 21:07:50,249][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:07:50,250][train][INFO] - Epoch 31/140
+[2025-11-10 21:09:41,830][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9277
+[2025-11-10 21:09:55,124][train][INFO] - Val Loss: 1.6920 | accuracy: 0.4083 | precision: 0.4015 | recall: 0.4013 | f1: 0.3790
+[2025-11-10 21:09:55,125][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 21:09:58,848][train][INFO] - Epoch 32/140
+[2025-11-10 21:11:54,350][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9270
+[2025-11-10 21:12:07,145][train][INFO] - Val Loss: 1.6729 | accuracy: 0.4089 | precision: 0.3999 | recall: 0.4042 | f1: 0.3779
+[2025-11-10 21:12:07,209][train][INFO] - 🏆 New best model! Val Loss: 1.6729
+[2025-11-10 21:12:07,209][train][INFO] - Epoch 33/140
+[2025-11-10 21:14:01,868][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9165
+[2025-11-10 21:14:15,247][train][INFO] - Val Loss: 1.8544 | accuracy: 0.3483 | precision: 0.4010 | recall: 0.3464 | f1: 0.3223
+[2025-11-10 21:14:15,250][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:14:15,251][train][INFO] - Epoch 34/140
+[2025-11-10 21:16:15,550][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.9072
+[2025-11-10 21:16:29,477][train][INFO] - Val Loss: 1.6405 | accuracy: 0.4217 | precision: 0.4075 | recall: 0.4159 | f1: 0.4029
+[2025-11-10 21:16:29,529][train][INFO] - 🏆 New best model! Val Loss: 1.6405
+[2025-11-10 21:16:29,530][train][INFO] - Epoch 35/140
+[2025-11-10 21:18:24,902][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8977
+[2025-11-10 21:18:37,960][train][INFO] - Val Loss: 1.6703 | accuracy: 0.4122 | precision: 0.3979 | recall: 0.4082 | f1: 0.3885
+[2025-11-10 21:18:37,961][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:18:37,961][train][INFO] - Epoch 36/140
+[2025-11-10 21:20:35,338][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8848
+[2025-11-10 21:20:48,814][train][INFO] - Val Loss: 1.6683 | accuracy: 0.4133 | precision: 0.4237 | recall: 0.4081 | f1: 0.4037
+[2025-11-10 21:20:48,815][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 21:20:48,816][train][INFO] - Epoch 37/140
+[2025-11-10 21:22:46,529][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8770
+[2025-11-10 21:23:00,021][train][INFO] - Val Loss: 1.6468 | accuracy: 0.4278 | precision: 0.4046 | recall: 0.4235 | f1: 0.4062
+[2025-11-10 21:23:00,022][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 21:23:00,023][train][INFO] - Epoch 38/140
+[2025-11-10 21:24:56,365][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8696
+[2025-11-10 21:25:09,562][train][INFO] - Val Loss: 1.6669 | accuracy: 0.4222 | precision: 0.4258 | recall: 0.4188 | f1: 0.4098
+[2025-11-10 21:25:09,563][train][INFO] - ⏳ No improvement for 4/12 epochs
+[2025-11-10 21:25:09,563][train][INFO] - Epoch 39/140
+[2025-11-10 21:27:07,346][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8766
+[2025-11-10 21:27:20,525][train][INFO] - Val Loss: 1.6004 | accuracy: 0.4494 | precision: 0.4513 | recall: 0.4430 | f1: 0.4360
+[2025-11-10 21:27:20,579][train][INFO] - 🏆 New best model! Val Loss: 1.6004
+[2025-11-10 21:27:20,579][train][INFO] - Epoch 40/140
+[2025-11-10 21:29:15,242][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8779
+[2025-11-10 21:29:28,686][train][INFO] - Val Loss: 1.6315 | accuracy: 0.4361 | precision: 0.4420 | recall: 0.4294 | f1: 0.4158
+[2025-11-10 21:29:28,687][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:29:28,688][train][INFO] - Epoch 41/140
+[2025-11-10 21:31:22,565][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8385
+[2025-11-10 21:31:36,054][train][INFO] - Val Loss: 1.6379 | accuracy: 0.4356 | precision: 0.4362 | recall: 0.4325 | f1: 0.4205
+[2025-11-10 21:31:36,055][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 21:31:40,739][train][INFO] - Epoch 42/140
+[2025-11-10 21:33:35,421][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8530
+[2025-11-10 21:33:48,723][train][INFO] - Val Loss: 1.6045 | accuracy: 0.4472 | precision: 0.4305 | recall: 0.4440 | f1: 0.4219
+[2025-11-10 21:33:48,723][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 21:33:48,724][train][INFO] - Epoch 43/140
+[2025-11-10 21:35:43,948][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8468
+[2025-11-10 21:35:57,248][train][INFO] - Val Loss: 1.5874 | accuracy: 0.4483 | precision: 0.4522 | recall: 0.4435 | f1: 0.4418
+[2025-11-10 21:35:57,302][train][INFO] - 🏆 New best model! Val Loss: 1.5874
+[2025-11-10 21:35:57,302][train][INFO] - Epoch 44/140
+[2025-11-10 21:37:53,100][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8427
+[2025-11-10 21:38:06,632][train][INFO] - Val Loss: 1.5362 | accuracy: 0.4678 | precision: 0.4551 | recall: 0.4638 | f1: 0.4499
+[2025-11-10 21:38:06,683][train][INFO] - 🏆 New best model! Val Loss: 1.5362
+[2025-11-10 21:38:06,683][train][INFO] - Epoch 45/140
+[2025-11-10 21:40:01,949][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8243
+[2025-11-10 21:40:15,422][train][INFO] - Val Loss: 1.6122 | accuracy: 0.4317 | precision: 0.4368 | recall: 0.4290 | f1: 0.4142
+[2025-11-10 21:40:15,423][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:40:15,424][train][INFO] - Epoch 46/140
+[2025-11-10 21:42:10,829][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8227
+[2025-11-10 21:42:24,146][train][INFO] - Val Loss: 1.6112 | accuracy: 0.4489 | precision: 0.4794 | recall: 0.4466 | f1: 0.4426
+[2025-11-10 21:42:24,147][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 21:42:24,147][train][INFO] - Epoch 47/140
+[2025-11-10 21:44:18,367][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8188
+[2025-11-10 21:44:31,816][train][INFO] - Val Loss: 1.5363 | accuracy: 0.4528 | precision: 0.4362 | recall: 0.4497 | f1: 0.4286
+[2025-11-10 21:44:31,817][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 21:44:31,818][train][INFO] - Epoch 48/140
+[2025-11-10 21:46:25,020][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8148
+[2025-11-10 21:46:38,411][train][INFO] - Val Loss: 1.6365 | accuracy: 0.4417 | precision: 0.4596 | recall: 0.4388 | f1: 0.4217
+[2025-11-10 21:46:38,411][train][INFO] - ⏳ No improvement for 4/12 epochs
+[2025-11-10 21:46:38,412][train][INFO] - Epoch 49/140
+[2025-11-10 21:48:31,545][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8050
+[2025-11-10 21:48:44,901][train][INFO] - Val Loss: 1.6117 | accuracy: 0.4283 | precision: 0.4383 | recall: 0.4244 | f1: 0.4107
+[2025-11-10 21:48:44,902][train][INFO] - ⏳ No improvement for 5/12 epochs
+[2025-11-10 21:48:44,902][train][INFO] - Epoch 50/140
+[2025-11-10 21:50:38,449][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.8102
+[2025-11-10 21:50:51,838][train][INFO] - Val Loss: 1.5480 | accuracy: 0.4672 | precision: 0.4729 | recall: 0.4652 | f1: 0.4508
+[2025-11-10 21:50:51,838][train][INFO] - ⏳ No improvement for 6/12 epochs
+[2025-11-10 21:50:51,839][train][INFO] - Epoch 51/140
+[2025-11-10 21:52:45,152][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7934
+[2025-11-10 21:52:58,283][train][INFO] - Val Loss: 1.5350 | accuracy: 0.4883 | precision: 0.4959 | recall: 0.4868 | f1: 0.4715
+[2025-11-10 21:52:58,336][train][INFO] - 🏆 New best model! Val Loss: 1.5350
+[2025-11-10 21:53:03,496][train][INFO] - Epoch 52/140
+[2025-11-10 21:54:56,618][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7834
+[2025-11-10 21:55:10,046][train][INFO] - Val Loss: 1.4864 | accuracy: 0.5028 | precision: 0.5022 | recall: 0.4990 | f1: 0.4897
+[2025-11-10 21:55:10,100][train][INFO] - 🏆 New best model! Val Loss: 1.4864
+[2025-11-10 21:55:10,100][train][INFO] - Epoch 53/140
+[2025-11-10 21:57:03,578][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7824
+[2025-11-10 21:57:16,497][train][INFO] - Val Loss: 1.5640 | accuracy: 0.4578 | precision: 0.4631 | recall: 0.4554 | f1: 0.4346
+[2025-11-10 21:57:16,498][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 21:57:16,499][train][INFO] - Epoch 54/140
+[2025-11-10 21:59:09,087][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7644
+[2025-11-10 21:59:22,158][train][INFO] - Val Loss: 1.6522 | accuracy: 0.4233 | precision: 0.4743 | recall: 0.4191 | f1: 0.4110
+[2025-11-10 21:59:22,159][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 21:59:22,159][train][INFO] - Epoch 55/140
+[2025-11-10 22:01:15,479][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7639
+[2025-11-10 22:01:28,863][train][INFO] - Val Loss: 1.5052 | accuracy: 0.4944 | precision: 0.5100 | recall: 0.4903 | f1: 0.4876
+[2025-11-10 22:01:28,864][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 22:01:28,865][train][INFO] - Epoch 56/140
+[2025-11-10 22:03:22,159][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7521
+[2025-11-10 22:03:35,478][train][INFO] - Val Loss: 1.5506 | accuracy: 0.4683 | precision: 0.4838 | recall: 0.4670 | f1: 0.4536
+[2025-11-10 22:03:35,479][train][INFO] - ⏳ No improvement for 4/12 epochs
+[2025-11-10 22:03:35,480][train][INFO] - Epoch 57/140
+[2025-11-10 22:05:30,913][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7388
+[2025-11-10 22:05:44,381][train][INFO] - Val Loss: 1.4810 | accuracy: 0.5033 | precision: 0.5037 | recall: 0.4996 | f1: 0.4968
+[2025-11-10 22:05:44,464][train][INFO] - 🏆 New best model! Val Loss: 1.4810
+[2025-11-10 22:05:44,465][train][INFO] - Epoch 58/140
+[2025-11-10 22:07:38,413][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7539
+[2025-11-10 22:07:51,393][train][INFO] - Val Loss: 1.5470 | accuracy: 0.4511 | precision: 0.4771 | recall: 0.4473 | f1: 0.4412
+[2025-11-10 22:07:51,394][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 22:07:51,394][train][INFO] - Epoch 59/140
+[2025-11-10 22:09:44,337][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7465
+[2025-11-10 22:09:57,774][train][INFO] - Val Loss: 1.4528 | accuracy: 0.5106 | precision: 0.5354 | recall: 0.5082 | f1: 0.5085
+[2025-11-10 22:09:57,829][train][INFO] - 🏆 New best model! Val Loss: 1.4528
+[2025-11-10 22:09:57,829][train][INFO] - Epoch 60/140
+[2025-11-10 22:11:51,757][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7440
+[2025-11-10 22:12:05,044][train][INFO] - Val Loss: 1.4223 | accuracy: 0.5089 | precision: 0.4988 | recall: 0.5061 | f1: 0.4980
+[2025-11-10 22:12:05,093][train][INFO] - 🏆 New best model! Val Loss: 1.4223
+[2025-11-10 22:12:05,093][train][INFO] - Epoch 61/140
+[2025-11-10 22:13:58,705][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7459
+[2025-11-10 22:14:12,364][train][INFO] - Val Loss: 1.4409 | accuracy: 0.5067 | precision: 0.5017 | recall: 0.5043 | f1: 0.4949
+[2025-11-10 22:14:12,365][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 22:14:15,477][train][INFO] - Epoch 62/140
+[2025-11-10 22:16:09,744][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7277
+[2025-11-10 22:16:22,486][train][INFO] - Val Loss: 1.4642 | accuracy: 0.4906 | precision: 0.5027 | recall: 0.4872 | f1: 0.4804
+[2025-11-10 22:16:22,487][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 22:16:22,488][train][INFO] - Epoch 63/140
+[2025-11-10 22:18:15,042][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7265
+[2025-11-10 22:18:27,990][train][INFO] - Val Loss: 1.4249 | accuracy: 0.5128 | precision: 0.5284 | recall: 0.5115 | f1: 0.5114
+[2025-11-10 22:18:27,991][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 22:18:27,992][train][INFO] - Epoch 64/140
+[2025-11-10 22:20:24,638][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7234
+[2025-11-10 22:20:37,832][train][INFO] - Val Loss: 1.5318 | accuracy: 0.4583 | precision: 0.4723 | recall: 0.4559 | f1: 0.4412
+[2025-11-10 22:20:37,832][train][INFO] - ⏳ No improvement for 4/12 epochs
+[2025-11-10 22:20:37,833][train][INFO] - Epoch 65/140
+[2025-11-10 22:22:32,557][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7310
+[2025-11-10 22:22:46,053][train][INFO] - Val Loss: 1.4492 | accuracy: 0.4967 | precision: 0.4900 | recall: 0.4950 | f1: 0.4771
+[2025-11-10 22:22:46,054][train][INFO] - ⏳ No improvement for 5/12 epochs
+[2025-11-10 22:22:46,054][train][INFO] - Epoch 66/140
+[2025-11-10 22:24:44,742][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.7056
+[2025-11-10 22:24:58,154][train][INFO] - Val Loss: 1.4141 | accuracy: 0.5067 | precision: 0.5153 | recall: 0.5054 | f1: 0.4959
+[2025-11-10 22:24:58,217][train][INFO] - 🏆 New best model! Val Loss: 1.4141
+[2025-11-10 22:24:58,754][train][INFO] - Epoch 67/140
+[2025-11-10 22:26:57,391][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6996
+[2025-11-10 22:27:11,220][train][INFO] - Val Loss: 1.4340 | accuracy: 0.5150 | precision: 0.5190 | recall: 0.5132 | f1: 0.4978
+[2025-11-10 22:27:11,220][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 22:27:11,221][train][INFO] - Epoch 68/140
+[2025-11-10 22:29:06,995][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6918
+[2025-11-10 22:29:20,504][train][INFO] - Val Loss: 1.4231 | accuracy: 0.5128 | precision: 0.5348 | recall: 0.5110 | f1: 0.5139
+[2025-11-10 22:29:20,505][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 22:29:20,506][train][INFO] - Epoch 69/140
+[2025-11-10 22:31:16,339][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6942
+[2025-11-10 22:31:29,610][train][INFO] - Val Loss: 1.4147 | accuracy: 0.5078 | precision: 0.4973 | recall: 0.5058 | f1: 0.4919
+[2025-11-10 22:31:29,610][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 22:31:29,611][train][INFO] - Epoch 70/140
+[2025-11-10 22:33:24,861][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6975
+[2025-11-10 22:33:37,758][train][INFO] - Val Loss: 1.3944 | accuracy: 0.5256 | precision: 0.5364 | recall: 0.5239 | f1: 0.5201
+[2025-11-10 22:33:37,808][train][INFO] - 🏆 New best model! Val Loss: 1.3944
+[2025-11-10 22:33:37,809][train][INFO] - Epoch 71/140
+[2025-11-10 22:35:30,646][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6714
+[2025-11-10 22:35:43,704][train][INFO] - Val Loss: 1.5129 | accuracy: 0.4883 | precision: 0.5026 | recall: 0.4890 | f1: 0.4778
+[2025-11-10 22:35:43,704][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 22:35:47,327][train][INFO] - Epoch 72/140
+[2025-11-10 22:37:39,499][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6840
+[2025-11-10 22:37:53,088][train][INFO] - Val Loss: 1.3861 | accuracy: 0.5294 | precision: 0.5313 | recall: 0.5281 | f1: 0.5140
+[2025-11-10 22:37:53,171][train][INFO] - 🏆 New best model! Val Loss: 1.3861
+[2025-11-10 22:37:53,171][train][INFO] - Epoch 73/140
+[2025-11-10 22:39:48,561][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6786
+[2025-11-10 22:40:02,139][train][INFO] - Val Loss: 1.3466 | accuracy: 0.5411 | precision: 0.5351 | recall: 0.5388 | f1: 0.5296
+[2025-11-10 22:40:02,190][train][INFO] - 🏆 New best model! Val Loss: 1.3466
+[2025-11-10 22:40:02,190][train][INFO] - Epoch 74/140
+[2025-11-10 22:41:58,565][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6811
+[2025-11-10 22:42:12,260][train][INFO] - Val Loss: 1.3820 | accuracy: 0.5339 | precision: 0.5477 | recall: 0.5340 | f1: 0.5210
+[2025-11-10 22:42:12,260][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 22:42:12,261][train][INFO] - Epoch 75/140
+[2025-11-10 22:44:09,662][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6751
+[2025-11-10 22:44:23,250][train][INFO] - Val Loss: 1.3587 | accuracy: 0.5489 | precision: 0.5536 | recall: 0.5481 | f1: 0.5428
+[2025-11-10 22:44:23,251][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 22:44:23,251][train][INFO] - Epoch 76/140
+[2025-11-10 22:46:18,430][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6548
+[2025-11-10 22:46:31,921][train][INFO] - Val Loss: 1.4110 | accuracy: 0.5167 | precision: 0.5495 | recall: 0.5160 | f1: 0.5129
+[2025-11-10 22:46:31,922][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 22:46:31,923][train][INFO] - Epoch 77/140
+[2025-11-10 22:48:29,502][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6490
+[2025-11-10 22:48:43,235][train][INFO] - Val Loss: 1.4473 | accuracy: 0.5011 | precision: 0.5120 | recall: 0.5008 | f1: 0.4824
+[2025-11-10 22:48:43,236][train][INFO] - ⏳ No improvement for 4/12 epochs
+[2025-11-10 22:48:43,237][train][INFO] - Epoch 78/140
+[2025-11-10 22:50:38,527][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6567
+[2025-11-10 22:50:51,558][train][INFO] - Val Loss: 1.3345 | accuracy: 0.5567 | precision: 0.5581 | recall: 0.5551 | f1: 0.5506
+[2025-11-10 22:50:51,608][train][INFO] - 🏆 New best model! Val Loss: 1.3345
+[2025-11-10 22:50:51,609][train][INFO] - Epoch 79/140
+[2025-11-10 22:52:45,012][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6551
+[2025-11-10 22:52:57,983][train][INFO] - Val Loss: 1.3633 | accuracy: 0.5428 | precision: 0.5492 | recall: 0.5411 | f1: 0.5321
+[2025-11-10 22:52:57,984][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 22:52:57,984][train][INFO] - Epoch 80/140
+[2025-11-10 22:54:48,338][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6440
+[2025-11-10 22:55:01,400][train][INFO] - Val Loss: 1.3757 | accuracy: 0.5322 | precision: 0.5607 | recall: 0.5303 | f1: 0.5283
+[2025-11-10 22:55:01,401][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 22:55:01,402][train][INFO] - Epoch 81/140
+[2025-11-10 22:56:52,260][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6493
+[2025-11-10 22:57:05,292][train][INFO] - Val Loss: 1.3546 | accuracy: 0.5239 | precision: 0.5510 | recall: 0.5234 | f1: 0.5192
+[2025-11-10 22:57:05,293][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 22:57:08,806][train][INFO] - Epoch 82/140
+[2025-11-10 22:59:03,283][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6416
+[2025-11-10 22:59:16,757][train][INFO] - Val Loss: 1.3495 | accuracy: 0.5294 | precision: 0.5495 | recall: 0.5291 | f1: 0.5235
+[2025-11-10 22:59:16,758][train][INFO] - ⏳ No improvement for 4/12 epochs
+[2025-11-10 22:59:16,759][train][INFO] - Epoch 83/140
+[2025-11-10 23:01:13,686][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6199
+[2025-11-10 23:01:26,934][train][INFO] - Val Loss: 1.3732 | accuracy: 0.5189 | precision: 0.5174 | recall: 0.5177 | f1: 0.4951
+[2025-11-10 23:01:26,934][train][INFO] - ⏳ No improvement for 5/12 epochs
+[2025-11-10 23:01:26,935][train][INFO] - Epoch 84/140
+[2025-11-10 23:03:21,338][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6361
+[2025-11-10 23:03:34,821][train][INFO] - Val Loss: 1.3480 | accuracy: 0.5533 | precision: 0.5844 | recall: 0.5532 | f1: 0.5561
+[2025-11-10 23:03:34,822][train][INFO] - ⏳ No improvement for 6/12 epochs
+[2025-11-10 23:03:34,822][train][INFO] - Epoch 85/140
+[2025-11-10 23:05:29,200][train][INFO] - 📊 LR: 1.00e-04, Train Loss: 1.6314
+[2025-11-10 23:05:42,479][train][INFO] - Val Loss: 1.3865 | accuracy: 0.5211 | precision: 0.5408 | recall: 0.5218 | f1: 0.5055
+[2025-11-10 23:05:42,480][train][INFO] - ⏳ No improvement for 7/12 epochs
+[2025-11-10 23:05:42,480][train][INFO] - 🔄 Learning Rate updated: 5.00e-05
+[2025-11-10 23:05:42,481][train][INFO] - Epoch 86/140
+[2025-11-10 23:07:36,431][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5908
+[2025-11-10 23:07:49,841][train][INFO] - Val Loss: 1.3082 | accuracy: 0.5594 | precision: 0.5759 | recall: 0.5572 | f1: 0.5533
+[2025-11-10 23:07:49,896][train][INFO] - 🏆 New best model! Val Loss: 1.3082
+[2025-11-10 23:07:50,416][train][INFO] - Epoch 87/140
+[2025-11-10 23:09:47,466][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5591
+[2025-11-10 23:10:00,732][train][INFO] - Val Loss: 1.2718 | accuracy: 0.5756 | precision: 0.5819 | recall: 0.5749 | f1: 0.5724
+[2025-11-10 23:10:00,793][train][INFO] - 🏆 New best model! Val Loss: 1.2718
+[2025-11-10 23:10:00,796][train][INFO] - Epoch 88/140
+[2025-11-10 23:11:56,728][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5625
+[2025-11-10 23:12:10,135][train][INFO] - Val Loss: 1.3169 | accuracy: 0.5556 | precision: 0.5667 | recall: 0.5545 | f1: 0.5478
+[2025-11-10 23:12:10,136][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 23:12:10,136][train][INFO] - Epoch 89/140
+[2025-11-10 23:14:05,893][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5644
+[2025-11-10 23:14:19,247][train][INFO] - Val Loss: 1.2820 | accuracy: 0.5661 | precision: 0.5853 | recall: 0.5655 | f1: 0.5623
+[2025-11-10 23:14:19,248][train][INFO] - ⏳ No improvement for 2/12 epochs
+[2025-11-10 23:14:19,249][train][INFO] - Epoch 90/140
+[2025-11-10 23:16:14,643][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5770
+[2025-11-10 23:16:27,941][train][INFO] - Val Loss: 1.2793 | accuracy: 0.5750 | precision: 0.5859 | recall: 0.5733 | f1: 0.5718
+[2025-11-10 23:16:27,942][train][INFO] - ⏳ No improvement for 3/12 epochs
+[2025-11-10 23:16:27,943][train][INFO] - Epoch 91/140
+[2025-11-10 23:18:24,391][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5572
+[2025-11-10 23:18:37,714][train][INFO] - Val Loss: 1.2456 | accuracy: 0.5878 | precision: 0.5836 | recall: 0.5865 | f1: 0.5784
+[2025-11-10 23:18:37,761][train][INFO] - 🏆 New best model! Val Loss: 1.2456
+[2025-11-10 23:18:41,937][train][INFO] - Epoch 92/140
+[2025-11-10 23:20:34,798][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5512
+[2025-11-10 23:20:48,391][train][INFO] - Val Loss: 1.2447 | accuracy: 0.5706 | precision: 0.5744 | recall: 0.5690 | f1: 0.5615
+[2025-11-10 23:20:48,443][train][INFO] - 🏆 New best model! Val Loss: 1.2447
+[2025-11-10 23:20:48,444][train][INFO] - Epoch 93/140
+[2025-11-10 23:22:41,819][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5526
+[2025-11-10 23:22:54,781][train][INFO] - Val Loss: 1.2300 | accuracy: 0.5850 | precision: 0.5881 | recall: 0.5839 | f1: 0.5758
+[2025-11-10 23:22:54,832][train][INFO] - 🏆 New best model! Val Loss: 1.2300
+[2025-11-10 23:22:54,832][train][INFO] - Epoch 94/140
+[2025-11-10 23:24:47,230][train][INFO] - 📊 LR: 5.00e-05, Train Loss: 1.5505
+[2025-11-10 23:25:00,601][train][INFO] - Val Loss: 1.2441 | accuracy: 0.5772 | precision: 0.5850 | recall: 0.5765 | f1: 0.5735
+[2025-11-10 23:25:00,602][train][INFO] - ⏳ No improvement for 1/12 epochs
+[2025-11-10 23:25:00,603][train][INFO] - Epoch 95/140

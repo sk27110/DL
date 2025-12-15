@@ -1,0 +1,3 @@
+_target_: src.model.ResNetV2
+num_classes: 43
+dropout_rate: 0.3

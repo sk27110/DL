@@ -1,0 +1,32 @@
+defaults:
+  - dataset: конфиг для датасета   
+  - transforms: конфиг для аугментация
+  - dataloader: конфиг для даталоадера
+  - train: конфиг для тренеровки модели
+  - model: конфиг модели
+  - load_dataset: конфиг для загрузки датасета
+  - metrics: конфиг для метрик
+  - optimizer: конфиг для оптипизатора
+  - scheduler: конфиг для sheduler-а
+
+
+seed: 42 #для воспроизводимости 
+
+
+experiment:
+  name: "name_exp"  #название экмперимента
+  log_dir: experiments/${experiment.name}/  #сюда идут логи при обучении и тесте
+  tb_log_dir: runs/${experiment.name}  #сюда идут логи для tensorboard
+  best_model_save_path: experiments/${experiment.name}/models/best_model.pth  #сюда сохраняется лучшая модель при обучении
+  last_model: experiments/exp2/models/best_model.pth  # путь к другой модели, если хотим дообучить
+
+# здесь настройки, чтобы hydra знала, куда ложить свои конфиги
+hydra:
+  run:
+    dir: experiments/${experiment.name}/  
+  
+  sweep:
+    dir: experiments/${experiment.name}/multirun/
+  
+  job:
+    chdir: false

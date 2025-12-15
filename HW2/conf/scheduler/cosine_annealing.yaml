@@ -1,0 +1,5 @@
+_target_: src.scheduler.CosineAnnealingWarmRestartsScheduler
+T_0: 25    
+T_mult: 2   
+eta_min: 1.0e-06
+last_epoch: -1
