@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from transformers import get_cosine_schedule_with_warmup
+from src.model_lstm import LSTMEncoderDecoder
 
 import wandb
 
@@ -41,7 +42,7 @@ def main():
     learning_rate = 2e-5
     train_CNN = True
 
-    model = EncoderDecoder(
+    model = LSTMEncoderDecoder(
         embed_size=embed_size,
         num_heads=num_heads,
         vocab_size=vocab_size,

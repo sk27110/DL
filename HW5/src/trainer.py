@@ -152,7 +152,7 @@ class Trainer:
                 wait = 0
                 torch.save({
                 "model_state_dict": self.model.state_dict(),
-                "model_class": "EncoderDecoder",
+                "model_class": "LSTMEncoderDecoder",
                 "model_args": {
                     "embed_size": self.model.embed_size,
                     "num_heads": self.model.num_heads,
